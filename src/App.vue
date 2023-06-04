@@ -19,8 +19,25 @@
 
         <div class="weather-box">
           <div class="temp">{{ Math.round(weather.main.temp) }}°c</div>
-          <div class="weather">{{ weather.weather[0].main }}</div>
+          <div class="humidity">L: {{ Math.round(weather.main.temp_min) }}°c H: {{ Math.round(weather.main.temp_max) }}°c</div>
+          <div class="humidity">Humidity: {{ Math.round(weather.main.humidity) }}%</div>
+          <div class="weather">Weather: {{ weather.weather[0].main }}</div>
         </div>
+      </div>
+      <div>
+        <h2>Search History</h2>
+        <table>
+          <tr>
+            <th>Location</th>
+            <th>Temperature</th>
+            <th>Action</th>
+          </tr>
+          <tr v-for="item in saveHistory" v-bind:key="item">
+            <td>{{ item.name }}</td>
+            <td>{{ Math.round(item.main.temp) }}°c</td>
+            <td><button v-on:click="btnDelete(item)">Delete</button></td>
+          </tr>
+        </table>
       </div>
     </main>
   </div>
@@ -34,7 +51,8 @@ export default {
       api_key: '86dce25148f8aba0a418967d5a42d80c',
       url_base: 'https://api.openweathermap.org/data/2.5/',
       query: '',
-      weather: {}
+      weather: {},
+      saveHistory: []
     }
   },
   methods: {
@@ -45,9 +63,12 @@ export default {
             return res.json();
           }).then(this.setResults);
       }
+      
     },
     setResults (results) {
       this.weather = results;
+      this.saveHistory.push(results)
+      console.log(this.saveHistory)
     },
     dateBuilder () {
       let d = new Date();
@@ -60,6 +81,10 @@ export default {
       let year = d.getFullYear();
 
       return `${day} ${date} ${month} ${year}`;
+    },
+
+    btnDelete(item) {
+      this.saveHistory.splice(this.saveHistory.indexOf(item), 1)
     }
   }
 }
@@ -77,14 +102,42 @@ body {
 }
 
 #app {
-  background-image: url('./assets/cold-bg.jpg');
+  background-image: url('./assets/bg-light.png');
   background-size: cover;
   background-position: bottom;
   transition: 0.4s;
 }
 
 #app.warm {
-  background-image: url('./assets/warm-bg.jpg');
+  background-image: url('./assets/bg-dark.png');
+}
+
+h2{
+  color: #fff;
+}
+
+table {
+  width:100%;
+  table-layout: fixed;
+}
+
+th{
+  padding: 20px 15px;
+  text-align: left;
+  color: #fff;
+  text-transform: uppercase;
+  background-color: rgba(255,255,255,0.3);
+}
+td{
+  padding: 15px;
+  text-align: left;
+  vertical-align:middle;
+  color: #fff;
+  border-bottom: solid 1px rgba(255,255,255,0.1);
+}
+
+button{
+  padding: 10px;
 }
 
 main {
@@ -161,7 +214,23 @@ main {
 
 .weather-box .weather {
   color: #FFF;
-  font-size: 48px;
+  font-size: 20px;
+  font-weight: 700;
+  font-style: italic;
+  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.weather-box .humidity {
+  color: #FFF;
+  font-size: 20px;
+  font-weight: 700;
+  font-style: italic;
+  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.weather-box .range {
+  color: #FFF;
+  font-size: 20px;
   font-weight: 700;
   font-style: italic;
   text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
